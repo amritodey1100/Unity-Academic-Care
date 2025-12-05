@@ -38,26 +38,63 @@ document.addEventListener("DOMContentLoaded", function () {
   handleHeaderScroll(); // Check on load
 
   // ============================================
-  // MOBILE MENU TOGGLE
+  // MOBILE MENU TOGGLE (Enhanced)
   // ============================================
   const mobileToggle = document.getElementById("mobileToggle");
   const navMenu = document.getElementById("navMenu");
+  let isMenuOpen = false;
 
-  mobileToggle.addEventListener("click", function () {
-    mobileToggle.classList.toggle("active");
-    navMenu.classList.toggle("active");
-    document.body.style.overflow = navMenu.classList.contains("active")
-      ? "hidden"
-      : "";
+  function openMenu() {
+    isMenuOpen = true;
+    mobileToggle.classList.add("active");
+    navMenu.classList.add("active");
+    document.body.style.overflow = "hidden";
+    mobileToggle.setAttribute("aria-expanded", "true");
+    // Focus first menu item for accessibility
+    setTimeout(() => {
+      const firstLink = navMenu.querySelector(".nav-link");
+      if (firstLink) firstLink.focus();
+    }, 100);
+  }
+
+  function closeMenu() {
+    isMenuOpen = false;
+    mobileToggle.classList.remove("active");
+    navMenu.classList.remove("active");
+    document.body.style.overflow = "";
+    mobileToggle.setAttribute("aria-expanded", "false");
+  }
+
+  // Toggle menu on button click
+  mobileToggle.addEventListener("click", function (e) {
+    e.stopPropagation();
+    if (isMenuOpen) {
+      closeMenu();
+    } else {
+      openMenu();
+    }
   });
 
   // Close menu when clicking a link
   navMenu.querySelectorAll(".nav-link").forEach((link) => {
     link.addEventListener("click", () => {
-      mobileToggle.classList.remove("active");
-      navMenu.classList.remove("active");
-      document.body.style.overflow = "";
+      closeMenu();
     });
+  });
+
+  // Close menu when clicking outside (on the backdrop)
+  navMenu.addEventListener("click", function (e) {
+    // Only close if clicking directly on the nav-menu (backdrop), not on links
+    if (e.target === navMenu) {
+      closeMenu();
+    }
+  });
+
+  // Close menu on window resize (if switching to desktop)
+  window.addEventListener("resize", function () {
+    if (window.innerWidth > 768 && isMenuOpen) {
+      closeMenu();
+    }
   });
 
   // ============================================
@@ -337,10 +374,24 @@ document.addEventListener("DOMContentLoaded", function () {
   // ============================================
   document.addEventListener("keydown", (e) => {
     // Escape key closes mobile menu
-    if (e.key === "Escape" && navMenu.classList.contains("active")) {
-      mobileToggle.classList.remove("active");
-      navMenu.classList.remove("active");
-      document.body.style.overflow = "";
+    if (e.key === "Escape" && isMenuOpen) {
+      closeMenu();
+      mobileToggle.focus(); // Return focus to toggle button
+    }
+
+    // Tab trap inside mobile menu
+    if (e.key === "Tab" && isMenuOpen) {
+      const focusableElements = navMenu.querySelectorAll(".nav-link");
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements[focusableElements.length - 1];
+
+      if (e.shiftKey && document.activeElement === firstElement) {
+        e.preventDefault();
+        lastElement.focus();
+      } else if (!e.shiftKey && document.activeElement === lastElement) {
+        e.preventDefault();
+        firstElement.focus();
+      }
     }
   });
 

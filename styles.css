@@ -370,21 +370,43 @@ select {
 .mobile-toggle {
   display: none;
   flex-direction: column;
+  justify-content: center;
+  align-items: center;
   gap: 5px;
   padding: 10px;
   z-index: 1001;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  margin-left: auto;
 }
 
 .mobile-toggle span {
-  width: 25px;
-  height: 3px;
+  display: block;
+  width: 24px;
+  height: 2.5px;
   background: var(--white);
-  border-radius: 3px;
-  transition: var(--transition-normal);
+  border-radius: 2px;
+  transition: all 0.3s ease;
+  transform-origin: center;
 }
 
 .header.scrolled .mobile-toggle span {
   background: var(--gray-800);
+}
+
+/* Hamburger to X animation */
+.mobile-toggle.active span:nth-child(1) {
+  transform: translateY(7.5px) rotate(45deg);
+}
+
+.mobile-toggle.active span:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+.mobile-toggle.active span:nth-child(3) {
+  transform: translateY(-7.5px) rotate(-45deg);
 }
 
 /* ============================================
@@ -1539,18 +1561,6 @@ select {
 
   .nav-menu.active .nav-link:active {
     background: rgba(255, 255, 255, 0.2);
-  }
-
-  .mobile-toggle.active span:nth-child(1) {
-    transform: rotate(45deg) translate(5px, 5px);
-  }
-
-  .mobile-toggle.active span:nth-child(2) {
-    opacity: 0;
-  }
-
-  .mobile-toggle.active span:nth-child(3) {
-    transform: rotate(-45deg) translate(7px, -7px);
   }
 
   /* Hero Mobile */
